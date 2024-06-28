@@ -1,7 +1,7 @@
 import nada_numpy as na
 from nada_ai import nn
 from nada_dsl import *
-
+#Hello i am Chirag Aswal AI/ML/Gen AI developer , i have used your documentation as a refernce to write this code and also make sure to pip install the 2 above libraries to before you run like nada-ai and nada-numpy
 class CreditScoreNN(nn.Module):
     """Privacy-preserving credit score neural network"""
 
@@ -22,21 +22,21 @@ class CreditScoreNN(nn.Module):
         return x
 
 def nada_main():
-    # Step 1: Create "Bank" (Provider) and "Customer" (User)
+    #first Create "Bank" (Provider) and "Customer" (User)
     customer = Party(name="Customer")
     bank = Party(name="Bank")
 
-    # Step 2: Instantiate credit score model
+    #then Instantiate credit score model
     credit_model = CreditScoreNN()
 
-    # Step 3: Load model weights from Nillion network
+    # after that Load model weights from Nillion network
     credit_model.load_state_from_network("credit_score_model", bank, na.SecretRational)
 
-    # Step 4: Load customer's financial data (provided by Customer)
+    # after that Load customer's financial data (provided by Customer)
     # Assume 10 features: income, debt, credit history, etc.
     customer_data = na.array((10,), customer, "customer_financial_data", na.SecretRational)
 
-    # Step 5: Compute credit score
+    # finally Compute credit score
     credit_score = credit_model(customer_data)
 
     # Step 6: Output the credit score for the Customer
