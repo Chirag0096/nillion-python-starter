@@ -1,38 +1,43 @@
-"""
-PROGRAM 2
-
-nr of stores: m = 3
-nr of products: n = 2
-"""
+import nada_numpy as na
+from nada_ai import nn
 from nada_dsl import *
-#store program
+
+class CreditScoreNN(nn.Module):
+    """Privacy-preserving credit score neural network"""
+
+    def __init__(self) -> None:
+        """Model with three layers and activations"""
+        self.linear_0 = nn.Linear(10, 8)
+        self.linear_1 = nn.Linear(8, 4)
+        self.linear_2 = nn.Linear(4, 1)
+        self.relu = nn.ReLU()
+
+    def forward(self, x: na.NadaArray) -> na.NadaArray:
+        """Forward pass for credit score prediction"""
+        x = self.linear_0(x)
+        x = self.relu(x)
+        x = self.linear_1(x)
+        x = self.relu(x)
+        x = self.linear_2(x)
+        return x
+
 def nada_main():
+    # Step 1: Create "Bank" (Provider) and "Customer" (User)
+    customer = Party(name="Customer")
+    bank = Party(name="Bank")
 
-    # 1. Parties initialization
-    store0 = Party(name="Store0")
-    store1 = Party(name="Store1")
-    store2 = Party(name="Store2")
-    outparty = Party(name="OutParty") 
+    # Step 2: Instantiate credit score model
+    credit_model = CreditScoreNN()
 
-    # 2. Inputs initialization
-    ## Sales from store 0
-    s0_p0 = SecretUnsignedInteger(Input(name="s0_p0", party=store0))
-    s0_p1 = SecretUnsignedInteger(Input(name="s0_p1", party=store0))
-    ## Sales from store 1
-    s1_p0 = SecretUnsignedInteger(Input(name="s1_p0", party=store1))
-    s1_p1 = SecretUnsignedInteger(Input(name="s1_p1", party=store1))
-    ## Sales from store 2
-    s2_p0 = SecretUnsignedInteger(Input(name="s2_p0", party=store2))
-    s2_p1 = SecretUnsignedInteger(Input(name="s2_p1", party=store2))
+    # Step 3: Load model weights from Nillion network
+    credit_model.load_state_from_network("credit_score_model", bank, na.SecretRational)
 
-    # 3. Computation
-    ## Add sales for product 0
-    result_p0 = s0_p0 + s1_p0 + s2_p0
-    ## Add sales for product 1
-    result_p1 = s0_p1 + s1_p1 + s2_p1
-    
-    # 4. Output
-    result_p0 = Output(result_p0, "final_sales_count_p0", outparty)
-    result_p1 = Output(result_p1, "final_sales_count_p1", outparty)
+    # Step 4: Load customer's financial data (provided by Customer)
+    # Assume 10 features: income, debt, credit history, etc.
+    customer_data = na.array((10,), customer, "customer_financial_data", na.SecretRational)
 
-    return [result_p0, result_p1]
+    # Step 5: Compute credit score
+    credit_score = credit_model(customer_data)
+
+    # Step 6: Output the credit score for the Customer
+    return credit_score.output(customer, "credit_score_result")
